@@ -3,17 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Flame, Award, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
-import { allAchievements, Achievement } from '@/lib/achievements';
+import { allAchievements } from '@/lib/achievements';
 import { FlashcardSet, TestResult } from '@/types';
-
-export type { TestResult };
 
 const AchievementsPage = () => {
   const [studyStreak, setStudyStreak] = useState(0);
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
   
   useEffect(() => {
-    // Calculate Study Streak
+
     const lastStudiedDateStr = localStorage.getItem('lastStudiedDate');
     if (lastStudiedDateStr) {
       const today = new Date();
@@ -26,14 +24,13 @@ const AchievementsPage = () => {
       }
     }
 
-    // Check for unlocked achievements
+
     const sets: FlashcardSet[] = JSON.parse(localStorage.getItem('flashcardSets') || '[]');
     const tests: TestResult[] = JSON.parse(localStorage.getItem('practiceTestResults') || '[]');
     
     const currentlyUnlocked = allAchievements.filter(ach => ach.isUnlocked(sets, tests));
     setUnlockedAchievements(currentlyUnlocked.map(ach => ach.id));
 
-    // When the user visits this page, update the "seen" count to clear the notification
     localStorage.setItem('seenAchievementsCount', currentlyUnlocked.length.toString());
 
   }, []);
@@ -41,12 +38,12 @@ const AchievementsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold font-heading text-gray-900 mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl font-bold font-heading text-gray-900 mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
             Your Progress
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
             Stay motivated by tracking your study streaks and earning achievements!
           </p>
         </div>
@@ -54,18 +51,18 @@ const AchievementsPage = () => {
         {/* Study Streak Card */}
         <Card className="max-w-4xl mx-auto mb-12 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader className="text-center">
-            <Flame className="h-16 w-16 mx-auto text-orange-500" />
-            <CardTitle className="text-3xl mt-2">Study Streak</CardTitle>
+            <Flame className="h-12 sm:h-16 w-12 sm:w-16 mx-auto text-orange-500" />
+            <CardTitle className="text-2xl sm:text-3xl mt-2">Study Streak</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-6xl font-bold">{studyStreak}</p>
+            <p className="text-5xl sm:text-6xl font-bold">{studyStreak}</p>
             <p className="text-gray-600">day{studyStreak !== 1 && 's'}</p>
           </CardContent>
         </Card>
 
         {/* Achievements Section */}
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 flex items-center">
             <Award className="mr-2 h-6 w-6" />
             Achievements
           </h2>

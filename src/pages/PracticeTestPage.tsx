@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Check, X, Loader2, Sparkles, Trophy, History } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { FlashcardSet } from '@/types';
+import { FlashcardSet, TestResult } from '@/types';
 import { cn } from '@/lib/utils';
 
 type TestType = 'multiple-choice' | 'fill-in-the-blank' | 'true-false';
@@ -17,14 +17,6 @@ interface TestQuestion {
   correctAnswer: string;
   userAnswer?: string;
   isCorrect?: boolean;
-}
-
-
-export interface TestResult {
-  setName: string;
-  score: number;
-  totalQuestions: number;
-  date: string;
 }
 
 const PracticeTestPage = () => {
@@ -99,7 +91,6 @@ const PracticeTestPage = () => {
       const result = await response.json();
       if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
         const parsedQuestions = JSON.parse(result.candidates[0].content.parts[0].text);
-        // This line is corrected to specify the type of 'q'
         const questionsWithType = parsedQuestions.map((q: Omit<TestQuestion, 'type'>) => ({ ...q, type: testType }));
         setTestQuestions(questionsWithType);
         setTestState('taking');
@@ -160,7 +151,7 @@ const PracticeTestPage = () => {
           <>
             <Card className="max-w-4xl mx-auto">
               <CardHeader>
-                <CardTitle>Create a Practice Test</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl">Create a Practice Test</CardTitle>
                 <CardDescription>Customize your test below.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
@@ -180,7 +171,7 @@ const PracticeTestPage = () => {
 
                 <div className="space-y-3">
                   <h3 className="text-lg font-medium">3. Test Type</h3>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <Button variant={testType === 'multiple-choice' ? 'default' : 'outline'} onClick={() => setTestType('multiple-choice')}>Multiple Choice</Button>
                     <Button variant={testType === 'fill-in-the-blank' ? 'default' : 'outline'} onClick={() => setTestType('fill-in-the-blank')}>Fill-in-the-Blank</Button>
                     <Button variant={testType === 'true-false' ? 'default' : 'outline'} onClick={() => setTestType('true-false')}>True/False</Button>
@@ -196,11 +187,11 @@ const PracticeTestPage = () => {
 
             {previousTests.length > 0 && (
               <div className="max-w-4xl mx-auto mt-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center"><History className="mr-2 h-6 w-6" />Previous Tests</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 flex items-center"><History className="mr-2 h-6 w-6" />Previous Tests</h2>
                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
                   <CardContent className="p-6 space-y-3">
                     {previousTests.slice(0, 5).map((result, index) => (
-                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                      <div key={index} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-gray-50 rounded-md gap-2">
                         <div>
                           <p className="font-semibold">{result.setName}</p>
                           <p className="text-sm text-gray-500">Taken on {result.date}</p>
@@ -266,7 +257,7 @@ const PracticeTestPage = () => {
               <CardDescription className="text-xl">You scored</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-6xl font-bold mb-4">{score} / {testQuestions.length}</p>
+              <p className="text-5xl sm:text-6xl font-bold mb-4">{score} / {testQuestions.length}</p>
               <div className="space-y-4 text-left">
                 {testQuestions.map((q, i) => (
                   <div key={i} className="p-3 border rounded-md">
@@ -287,9 +278,9 @@ const PracticeTestPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold font-heading text-gray-900 mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">AI Practice Test</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold font-heading text-gray-900 mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">AI Practice Test</h1>
         </div>
         {renderContent()}
       </div>

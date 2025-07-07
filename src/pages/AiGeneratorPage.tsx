@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Upload, Wand2, Loader2, Save } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { FlashcardSet} from '@/types';
-
+import { FlashcardSet } from '@/types';
 
 const AiGeneratorPage = () => {
   const [topic, setTopic] = useState('');
@@ -17,13 +16,14 @@ const AiGeneratorPage = () => {
   const [generatedCards, setGeneratedCards] = useState<{ front: string; back: string }[]>([]);
   const navigate = useNavigate();
 
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
     }
   };
 
-  // Helper function to read file content
   const readFileContent = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -43,6 +43,11 @@ const AiGeneratorPage = () => {
       return;
     }
 
+    if (!apiKey) {
+      alert("API Key not found. Please make sure you have set it up correctly in your .env file with the 'VITE_' prefix and have restarted the development server.");
+      return;
+    }
+
     setIsLoading(true);
     setGeneratedCards([]);
 
@@ -55,7 +60,7 @@ const AiGeneratorPage = () => {
       const prompt = `
         Based on the following information, generate a set of flashcards. Each flashcard should be a distinct concept.
         The topic is: "${topic}".
-        Things to take into consideration: "${notes}".
+        Additional notes: "${notes}".
         Content from uploaded file: "${fileContent}".
 
         Return the flashcards as a JSON array of objects, where each object has a "front" and a "back" key.
@@ -80,8 +85,7 @@ const AiGeneratorPage = () => {
               }
           }
       };
-
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY; 
+      
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
       
       const response = await fetch(apiUrl, {
@@ -91,7 +95,7 @@ const AiGeneratorPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        throw new Error(`API request failed with status ${response.status}.`);
       }
       
       const result = await response.json();
@@ -105,7 +109,7 @@ const AiGeneratorPage = () => {
 
     } catch (error) {
       console.error("Error generating flashcards:", error);
-      alert("There was an error generating the flashcards. Please check the console for details.");
+      alert(error instanceof Error ? error.message : "An unknown error occurred.");
     } finally {
       setIsLoading(false);
     }
@@ -120,35 +124,35 @@ const AiGeneratorPage = () => {
       description: `Generated on ${new Date().toLocaleDateString()}`,
       cards: generatedCards.map((card, index) => ({ ...card, id: index.toString() })),
       createdAt: new Date().toISOString(),
+      studyProgress: 0,
     };
 
-    // Retrieve existing sets, add the new one, and save back to localStorage
     const savedSets = localStorage.getItem('flashcardSets');
     const sets = savedSets ? JSON.parse(savedSets) : [];
     const updatedSets = [...sets, newSet];
     localStorage.setItem('flashcardSets', JSON.stringify(updatedSets));
 
     alert("Set saved successfully!");
-    navigate('/'); // Navigate back to the homepage
+    navigate('/');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold font-heading text-gray-900 mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl font-bold font-heading text-gray-900 mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
             AI Flashcard Generator
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
             Let AI do the heavy lifting. Provide a topic, upload your notes, or paste them in to instantly create a new study set.
           </p>
         </div>
 
         <Card className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader>
-            <CardTitle>Create with AI</CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl">Create with AI</CardTitle>
             <CardDescription>Enter the details below to generate your flashcards.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -179,7 +183,7 @@ const AiGeneratorPage = () => {
                 <label htmlFor="file-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-10 h-10 mb-3 text-gray-400" />
-                    <p className="mb-2 text-sm text-gray-500">
+                    <p className="mb-2 text-sm text-gray-500 text-center">
                       <span className="font-semibold">Click to upload</span> or drag and drop
                     </p>
                     <p className="text-xs text-gray-500">TXT, MD, or other text files</p>
@@ -203,19 +207,19 @@ const AiGeneratorPage = () => {
         
         {generatedCards.length > 0 && (
           <Card className="max-w-4xl mx-auto mt-8 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <CardTitle>Generated Cards</CardTitle>
+                <CardTitle className="text-2xl">Generated Cards</CardTitle>
                 <CardDescription>Review the cards below and save them to a new set.</CardDescription>
               </div>
-              <Button onClick={handleSaveSet}>
+              <Button onClick={handleSaveSet} className="w-full sm:w-auto">
                 <Save className="mr-2 h-4 w-4" />
                 Save and Add to My Sets
               </Button>
             </CardHeader>
             <CardContent className="space-y-2">
               {generatedCards.map((card, index) => (
-                <div key={index} className="p-3 border rounded-md bg-gray-50 grid grid-cols-2 gap-4">
+                <div key={index} className="p-3 border rounded-md bg-gray-50 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                   <p><span className="font-semibold">Front:</span> {card.front}</p>
                   <p><span className="font-semibold">Back:</span> {card.back}</p>
                 </div>
