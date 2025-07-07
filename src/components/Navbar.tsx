@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Home, Wand2 } from 'lucide-react';
+import { Home, Wand2, Beaker } from 'lucide-react';
+
 
 // Make the search props optional so this Navbar can be used on pages without search functionality.
 interface NavbarProps {
@@ -46,6 +47,12 @@ const Navbar: React.FC<NavbarProps> = ({ searchQuery, setSearchQuery }) => {
             <Link to="/ai-generator">
               <Wand2 className="mr-2 h-4 w-4" />
               Create with AI
+            </Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link to="/practice-test">
+              <Beaker className="mr-2 h-4 w-4" />
+              Practice Test
             </Link>
           </Button>
         </div>
