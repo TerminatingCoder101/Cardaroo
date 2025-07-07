@@ -55,7 +55,7 @@ const AiGeneratorPage = () => {
       const prompt = `
         Based on the following information, generate a set of flashcards. Each flashcard should be a distinct concept.
         The topic is: "${topic}".
-        Additional notes: "${notes}".
+        Things to take into consideration: "${notes}".
         Content from uploaded file: "${fileContent}".
 
         Return the flashcards as a JSON array of objects, where each object has a "front" and a "back" key.
