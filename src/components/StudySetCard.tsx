@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Play, MoreVertical, Trash2 } from 'lucide-react';
+import { BookOpen, Play, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +17,10 @@ interface StudySetCardProps {
   onDelete: (setId: string) => void;
   onRename: (id: string) => void;
   onStudy: () => void;
+  onEdit: (set: FlashcardSet) => void;
 }
 
-const StudySetCard = ({ set, onDelete, onRename, onStudy }: StudySetCardProps) => {
+const StudySetCard = ({ set, onDelete, onRename, onStudy, onEdit}: StudySetCardProps) => {
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this study set?')) {
       onDelete(set.id)
@@ -53,6 +54,10 @@ const handleRename = () => {
               <DropdownMenuItem onClick={handleRename} className="text-black hover:bg-red-50">
                 <BookOpen className="h-4 w-4 mr-2" />
                 Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(set)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                <span>Edit</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete} className="text-red-600 hover:bg-red-50">
                 <Trash2 className="h-4 w-4 mr-2" />
