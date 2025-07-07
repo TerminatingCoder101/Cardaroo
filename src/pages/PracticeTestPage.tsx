@@ -38,9 +38,10 @@ const PracticeTestPage = () => {
     setTestState('generating');
 
     const prompt = `
-      Based on the following flashcard set titled "${selectedSet.title}", create a multiple-choice practice test with 5 questions.
+      Based on the following flashcard set titled "${selectedSet.title}", create a multiple-choice practice test with 20 questions.
       Each question must test a concept from the flashcards.
       For each question, provide 4 options, one of which is the correct answer.
+      No super tricky options. 
 
       Flashcard Content:
       ${selectedSet.cards.map(card => `- ${card.front}: ${card.back}`).join('\n')}
