@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { FlashcardSet } from '@/pages/Index'; // Adjust this import path if needed
+import { FlashcardSet } from '@/types';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface EditSetModalProps {
@@ -44,7 +44,7 @@ const EditSetModal: React.FC<EditSetModalProps> = ({ isOpen, onClose, onUpdateSe
   };
 
   const handleSubmit = () => {
-    if (!set) return; // Should not happen if modal is open
+    if (!set) return;
 
     const updatedSet: FlashcardSet = {
       ...set,

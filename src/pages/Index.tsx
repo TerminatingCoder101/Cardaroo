@@ -18,18 +18,17 @@ const Index = () => {
   const [setBeingEdited, setSetBeingEdited] = useState<FlashcardSet | null>(null);
   const [hasNewAchievement, setHasNewAchievement] = useState(false);
   const [avgTestScore, setAvgTestScore] = useState(0);
-  const [hasTakenTests, setHasTakenTests] = useState(false); // State to check if tests exist
+  const [hasTakenTests, setHasTakenTests] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
     const savedSets: FlashcardSet[] = JSON.parse(localStorage.getItem('flashcardSets') || '[]');
     setSets(savedSets);
     
-    // Calculate average test score
     const savedResults = localStorage.getItem('practiceTestResults');
     const tests: TestResult[] = savedResults ? JSON.parse(savedResults) : [];
     
-    setHasTakenTests(tests.length > 0); // Check if any tests have been taken
+    setHasTakenTests(tests.length > 0);
 
     if (tests.length > 0) {
       const totalPercentage = tests.reduce((acc, test) => {
@@ -42,7 +41,6 @@ const Index = () => {
       setAvgTestScore(Math.round(average));
     }
 
-    // Check for new achievements
     const currentUnlocked = allAchievements.filter(ach => ach.isUnlocked(savedSets, tests)).length;
     const seenCount = parseInt(localStorage.getItem('seenAchievementsCount') || '0', 10);
 

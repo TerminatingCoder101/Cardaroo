@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2 } from 'lucide-react';
-import { FlashcardSet } from '@/pages/Index';
+import { FlashcardSet } from '@/types';
 
 interface CreateSetModalProps {
   isOpen: boolean;

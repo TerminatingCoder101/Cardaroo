@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FlashcardSet } from '@/pages/Index';
+import { FlashcardSet } from '@/types';
 
 interface StudySetCardProps {
   set: FlashcardSet;
