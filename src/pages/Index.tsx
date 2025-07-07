@@ -8,7 +8,7 @@ import CreateSetModal from '@/components/CreateSetModal';
 import StudySetCard from '@/components/StudySetCard';
 import EditSetModal from '@/components/EditSetModal';
 import { allAchievements } from '@/lib/achievements';
-import { FlashcardSet, TestResult } from '@/types'; // Import from the new types file
+import { FlashcardSet, TestResult } from '@/types';
 
 const Index = () => {
   const [sets, setSets] = useState<FlashcardSet[]>([]);
@@ -17,14 +17,32 @@ const Index = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [setBeingEdited, setSetBeingEdited] = useState<FlashcardSet | null>(null);
   const [hasNewAchievement, setHasNewAchievement] = useState(false);
+  const [avgTestScore, setAvgTestScore] = useState(0);
+  const [hasTakenTests, setHasTakenTests] = useState(false); // State to check if tests exist
   const navigate = useNavigate();
 
   useEffect(() => {
     const savedSets: FlashcardSet[] = JSON.parse(localStorage.getItem('flashcardSets') || '[]');
     setSets(savedSets);
     
+    // Calculate average test score
+    const savedResults = localStorage.getItem('practiceTestResults');
+    const tests: TestResult[] = savedResults ? JSON.parse(savedResults) : [];
+    
+    setHasTakenTests(tests.length > 0); // Check if any tests have been taken
+
+    if (tests.length > 0) {
+      const totalPercentage = tests.reduce((acc, test) => {
+        if (test.totalQuestions > 0) {
+          return acc + (test.score / test.totalQuestions) * 100;
+        }
+        return acc;
+      }, 0);
+      const average = totalPercentage / tests.length;
+      setAvgTestScore(Math.round(average));
+    }
+
     // Check for new achievements
-    const tests: TestResult[] = JSON.parse(localStorage.getItem('practiceTestResults') || '[]');
     const currentUnlocked = allAchievements.filter(ach => ach.isUnlocked(savedSets, tests)).length;
     const seenCount = parseInt(localStorage.getItem('seenAchievementsCount') || '0', 10);
 
@@ -135,14 +153,20 @@ const Index = () => {
           </Card>
           
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-6 text-center flex flex-col justify-center items-center h-full">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {Math.round(sets.reduce((total, set) => total + (set.studyProgress || 0), 0) / (sets.length || 1))}%
-              </h3>
-              <p className="text-gray-600">Avg Progress</p>
+              {hasTakenTests ? (
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {avgTestScore}%
+                </h3>
+              ) : (
+                <p className="text-sm text-gray-500 mt-1">
+                  Take your first test to see your average!
+                </p>
+              )}
+              <p className="text-gray-600 mt-auto">Avg Test Score</p>
             </CardContent>
           </Card>
         </div>

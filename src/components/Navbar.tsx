@@ -27,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchQuery, setSearchQuery, hasNewAchi
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="font-bold text-xl text-gray-900">
+            <Link to="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent">
               Cardaroo
             </Link>
           </div>
