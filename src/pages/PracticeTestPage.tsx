@@ -20,7 +20,7 @@ interface TestQuestion {
 }
 
 
-interface TestResult {
+export interface TestResult {
   setName: string;
   score: number;
   totalQuestions: number;

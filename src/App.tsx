@@ -9,6 +9,7 @@ import StudyPage from "./pages/StudyPage";
 import AiGeneratorPage from "./pages/AiGeneratorPage";
 import NotFound from "./pages/NotFound";
 import PracticeTestPage from "./pages/PracticeTestPage";
+import AchievementsPage from "./pages/AchievementsPage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/study/:setId" element={<StudyPage />} />
           <Route path="/ai-generator" element={<AiGeneratorPage />} />
           <Route path="/practice-test" element={<PracticeTestPage />} />
+          <Route path="/achievements" element={<AchievementsPage />} /> 
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
