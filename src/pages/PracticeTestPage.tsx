@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
 import { Check, X, Loader2, Sparkles, Trophy } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { FlashcardSet } from './Index'; 
+import { FlashcardSet } from './Index'; // Adjust path if needed
 import { cn } from '@/lib/utils';
 
+// Define the structure for a single AI-generated question
 interface TestQuestion {
   question: string;
   options: string[];
@@ -22,10 +24,11 @@ const PracticeTestPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [testState, setTestState] = useState<'selecting' | 'generating' | 'taking' | 'results'>('selecting');
+  const [numQuestions, setNumQuestions] = useState(5); // 1. State for number of questions
   
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-
+  // Load all study sets from local storage when the page loads
   useEffect(() => {
     const savedSets = localStorage.getItem('flashcardSets');
     if (savedSets) {
@@ -37,12 +40,12 @@ const PracticeTestPage = () => {
     if (!selectedSet) return;
     setTestState('generating');
 
+    // 2. Use the numQuestions state in the prompt
     const prompt = `
-      Based on the following flashcard set titled "${selectedSet.title}", create a multiple-choice practice test with 20 questions.
+      Based on the following flashcard set titled "${selectedSet.title}", create a multiple-choice practice test with ${numQuestions} questions.
       Each question must test a concept from the flashcards.
       For each question, provide 4 options, one of which is the correct answer.
-      No super tricky options. 
-
+        No tricky questions. 
       Flashcard Content:
       ${selectedSet.cards.map(card => `- ${card.front}: ${card.back}`).join('\n')}
 
@@ -133,21 +136,39 @@ const PracticeTestPage = () => {
           <Card className="max-w-4xl mx-auto">
             <CardHeader>
               <CardTitle>Select a Study Set</CardTitle>
-              <CardDescription>Choose which set you'd like to be tested on.</CardDescription>
+              <CardDescription>Choose which set you'd like to be tested on and how many questions you want.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allSets.map(set => (
-                  <Button 
-                    key={set.id} 
-                    variant={selectedSet?.id === set.id ? "default" : "outline"}
-                    onClick={() => setSelectedSet(set)}
-                    className="h-auto py-4"
-                  >
-                    {set.title}
-                  </Button>
-                ))}
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-2">1. Select a Set</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {allSets.map(set => (
+                    <Button 
+                      key={set.id} 
+                      variant={selectedSet?.id === set.id ? "default" : "outline"}
+                      onClick={() => setSelectedSet(set)}
+                      className="h-auto py-4"
+                    >
+                      {set.title}
+                    </Button>
+                  ))}
+                </div>
               </div>
+              
+              {/* 3. Add the number input to the UI */}
+              <div className="space-y-2">
+                <label htmlFor="num-questions" className="text-lg font-medium">2. Number of Questions</label>
+                <Input
+                  id="num-questions"
+                  type="number"
+                  value={numQuestions}
+                  onChange={(e) => setNumQuestions(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                  className="max-w-[100px]"
+                  min="1"
+                  max="20"
+                />
+              </div>
+
               <Button onClick={handleGenerateTest} disabled={!selectedSet} className="w-full">
                 <Sparkles className="mr-2 h-4 w-4" />
                 Generate Practice Test
