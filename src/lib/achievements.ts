@@ -29,7 +29,7 @@ export const allAchievements: Achievement[] = [
     name: 'AI Assistant',
     description: 'Generate a set using the AI.',
     icon: BrainCircuit,
-    isUnlocked: (sets) => sets.some(set => set.title.includes('AI Generated Set')),
+    isUnlocked: (sets) => sets.some(set => set.description.includes('Generated On')),
   },
   {
     id: 'first-test',
