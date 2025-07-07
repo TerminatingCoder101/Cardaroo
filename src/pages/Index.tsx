@@ -7,18 +7,8 @@ import Navbar from '@/components/Navbar';
 import CreateSetModal from '@/components/CreateSetModal';
 import StudySetCard from '@/components/StudySetCard';
 import EditSetModal from '@/components/EditSetModal';
-
-export interface FlashcardSet {
-  id: string;
-  title: string;
-  description: string;
-  cards: Array<{
-    id: string;
-    front: string;
-    back: string;
-  }>;
-  createdAt: string;
-}
+import { allAchievements } from '@/lib/achievements'; 
+import { FlashcardSet, TestResult } from '@/types';
 
 const Index = () => {
   const [sets, setSets] = useState<FlashcardSet[]>([]);
@@ -26,6 +16,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [setBeingEdited, setSetBeingEdited] = useState<FlashcardSet | null>(null);
+  const [hasNewAchievement, setHasNewAchievement] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +24,7 @@ const Index = () => {
     if (savedSets) {
       setSets(JSON.parse(savedSets));
     } else {
-
+      // Add some sample sets if local storage is empty
       const sampleSets: FlashcardSet[] = [
         {
           id: '1',
@@ -41,6 +32,7 @@ const Index = () => {
           description: 'Essential Arabic words for beginners',
           cards: [ { id: '1', front: 'Hello', back: 'Marhaba' }, { id: '2', front: 'Goodbye', back: 'Massalaam' }, { id: '3', front: 'I', back: 'Ana' }, { id: '4', front: 'Arabic', back: 'Al Arabiya' } ],
           createdAt: new Date().toISOString(),
+          studyProgress: 75
         },
         {
           id: '2',
@@ -48,11 +40,22 @@ const Index = () => {
           description: 'Key concepts in cellular biology',
           cards: [ { id: '1', front: 'What is mitosis?', back: 'Cell division that produces two identical diploid cells' }, { id: '2', front: 'What is photosynthesis?', back: 'Process by which plants convert light energy into chemical energy' }, { id: '3', front: 'What is DNA?', back: 'Deoxyribonucleic acid - carries genetic information' } ],
           createdAt: new Date().toISOString(),
+          studyProgress: 40
         }
       ];
       setSets(sampleSets);
       localStorage.setItem('flashcardSets', JSON.stringify(sampleSets));
     }
+
+
+    const tests: TestResult[] = JSON.parse(localStorage.getItem('practiceTestResults') || '[]');
+    const currentUnlocked = allAchievements.filter(ach => ach.isUnlocked(JSON.parse(savedSets || '[]'), tests)).length;
+    const seenCount = parseInt(localStorage.getItem('seenAchievementsCount') || '0', 10);
+
+    if (currentUnlocked > seenCount) {
+      setHasNewAchievement(true);
+    }
+
   }, []);
 
   const handleCreateSet = (newSet: Omit<FlashcardSet, 'id' | 'createdAt'>) => {
@@ -108,7 +111,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} hasNewAchievement={hasNewAchievement} />
       
       <div className="container mx-auto px-4 pt-8">
         {/* Hero Section */}

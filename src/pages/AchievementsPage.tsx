@@ -3,16 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Flame, Award, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
-import { allAchievements, Achievement } from '@/lib/achievements'; 
-import { FlashcardSet } from './Index';
-import { TestResult } from './PracticeTestPage';
+import { allAchievements, Achievement } from '@/lib/achievements';
+import { FlashcardSet, TestResult } from '@/types';
+
+export type { TestResult };
 
 const AchievementsPage = () => {
   const [studyStreak, setStudyStreak] = useState(0);
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
   
   useEffect(() => {
-
+    // Calculate Study Streak
     const lastStudiedDateStr = localStorage.getItem('lastStudiedDate');
     if (lastStudiedDateStr) {
       const today = new Date();
@@ -21,17 +22,19 @@ const AchievementsPage = () => {
       const differenceInDays = differenceInTime / (1000 * 3600 * 24);
 
       if (differenceInDays <= 1) {
-
         setStudyStreak(1); 
       }
     }
 
-
+    // Check for unlocked achievements
     const sets: FlashcardSet[] = JSON.parse(localStorage.getItem('flashcardSets') || '[]');
     const tests: TestResult[] = JSON.parse(localStorage.getItem('practiceTestResults') || '[]');
     
-    const unlocked = allAchievements.filter(ach => ach.isUnlocked(sets, tests)).map(ach => ach.id);
-    setUnlockedAchievements(unlocked);
+    const currentlyUnlocked = allAchievements.filter(ach => ach.isUnlocked(sets, tests));
+    setUnlockedAchievements(currentlyUnlocked.map(ach => ach.id));
+
+    // When the user visits this page, update the "seen" count to clear the notification
+    localStorage.setItem('seenAchievementsCount', currentlyUnlocked.length.toString());
 
   }, []);
 

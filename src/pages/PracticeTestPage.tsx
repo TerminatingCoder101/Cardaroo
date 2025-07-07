@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Check, X, Loader2, Sparkles, Trophy, History } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { FlashcardSet } from './Index'; 
+import { FlashcardSet } from '@/types';
 import { cn } from '@/lib/utils';
 
 type TestType = 'multiple-choice' | 'fill-in-the-blank' | 'true-false';

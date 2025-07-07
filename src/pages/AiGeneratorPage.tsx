@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Upload, Wand2, Loader2, Save } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { FlashcardSet } from '@/pages/Index';
+import { FlashcardSet} from '@/types';
 
 
 const AiGeneratorPage = () => {

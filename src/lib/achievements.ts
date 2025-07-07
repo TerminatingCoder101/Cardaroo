@@ -1,5 +1,4 @@
-import { FlashcardSet } from "@/pages/Index";
-import { TestResult } from "@/pages/PracticeTestPage";
+import { FlashcardSet, TestResult } from '@/types';
 import { Book, PlusCircle, BrainCircuit, Target, Trophy, LucideIcon } from "lucide-react";
 
 export interface Achievement {
