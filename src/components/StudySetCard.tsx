@@ -80,16 +80,6 @@ const handleRename = () => {
             </Badge>
           </div>
           
-          {set.studyProgress !== undefined && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Progress</span>
-                <span className="font-medium text-gray-900">{set.studyProgress}%</span>
-              </div>
-              <Progress value={set.studyProgress} className="h-2" />
-            </div>
-          )}
-          
           <Button 
             onClick={onStudy}
             className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-blue-700 hover:to-blue-700 text-white transition-all duration-300"

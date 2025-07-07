@@ -18,7 +18,6 @@ export interface FlashcardSet {
     back: string;
   }>;
   createdAt: string;
-  studyProgress?: number;
 }
 
 const Index = () => {
@@ -42,7 +41,6 @@ const Index = () => {
           description: 'Essential Arabic words for beginners',
           cards: [ { id: '1', front: 'Hello', back: 'Marhaba' }, { id: '2', front: 'Goodbye', back: 'Massalaam' }, { id: '3', front: 'I', back: 'Ana' }, { id: '4', front: 'Arabic', back: 'Al Arabiya' } ],
           createdAt: new Date().toISOString(),
-          studyProgress: 75
         },
         {
           id: '2',
@@ -50,7 +48,6 @@ const Index = () => {
           description: 'Key concepts in cellular biology',
           cards: [ { id: '1', front: 'What is mitosis?', back: 'Cell division that produces two identical diploid cells' }, { id: '2', front: 'What is photosynthesis?', back: 'Process by which plants convert light energy into chemical energy' }, { id: '3', front: 'What is DNA?', back: 'Deoxyribonucleic acid - carries genetic information' } ],
           createdAt: new Date().toISOString(),
-          studyProgress: 40
         }
       ];
       setSets(sampleSets);

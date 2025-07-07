@@ -31,17 +31,6 @@ const Navbar: React.FC<NavbarProps> = ({ searchQuery, setSearchQuery }) =>{
                 Cardaroo
               </span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <Button
-                variant={location.pathname === '/' ? "default" : "ghost"}
-                onClick={() => navigate('/')}
-                className="flex items-center space-x-2"
-              >
-                <Home className="h-4 w-4" />
-                <span>Home</span>
-              </Button>
-            </div>
           </div>
 
           <div className="w-1/3">
