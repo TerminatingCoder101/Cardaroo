@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import StudyPage from "./pages/StudyPage";
+import AiGeneratorPage from "./components/AIGeneratorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index/>} />
           <Route path="/study/:setId" element={<StudyPage />} />
+          <Route path="/ai-generator" element={<AiGeneratorPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
