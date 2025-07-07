@@ -3,18 +3,24 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { Check, X, Loader2, Sparkles, Trophy } from 'lucide-react';
+import { Check, X, Loader2, Sparkles, Trophy, History } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { FlashcardSet } from './Index'; // Adjust path if needed
+import { FlashcardSet } from './Index'; 
 import { cn } from '@/lib/utils';
 
-// Define the structure for a single AI-generated question
 interface TestQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
   userAnswer?: string;
   isCorrect?: boolean;
+}
+
+interface TestResult {
+  setName: string;
+  score: number;
+  totalQuestions: number;
+  date: string;
 }
 
 const PracticeTestPage = () => {
@@ -24,15 +30,20 @@ const PracticeTestPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [testState, setTestState] = useState<'selecting' | 'generating' | 'taking' | 'results'>('selecting');
-  const [numQuestions, setNumQuestions] = useState(5); // 1. State for number of questions
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [previousTests, setPreviousTests] = useState<TestResult[]>([]); // State for previous test results
   
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-  // Load all study sets from local storage when the page loads
+
   useEffect(() => {
     const savedSets = localStorage.getItem('flashcardSets');
     if (savedSets) {
       setAllSets(JSON.parse(savedSets));
+    }
+    const savedResults = localStorage.getItem('practiceTestResults');
+    if (savedResults) {
+      setPreviousTests(JSON.parse(savedResults));
     }
   }, []);
 
@@ -40,12 +51,11 @@ const PracticeTestPage = () => {
     if (!selectedSet) return;
     setTestState('generating');
 
-    // 2. Use the numQuestions state in the prompt
     const prompt = `
       Based on the following flashcard set titled "${selectedSet.title}", create a multiple-choice practice test with ${numQuestions} questions.
       Each question must test a concept from the flashcards.
       For each question, provide 4 options, one of which is the correct answer.
-        No tricky questions. 
+
       Flashcard Content:
       ${selectedSet.cards.map(card => `- ${card.front}: ${card.back}`).join('\n')}
 
@@ -110,71 +120,104 @@ const PracticeTestPage = () => {
     const currentQuestion = testQuestions[currentQuestionIndex];
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
 
-    // Update the question with the user's answer and result
     const updatedQuestions = [...testQuestions];
     updatedQuestions[currentQuestionIndex] = { ...currentQuestion, userAnswer: selectedAnswer, isCorrect };
     setTestQuestions(updatedQuestions);
 
-    // Move to the next question or to the results page
     setTimeout(() => {
       setSelectedAnswer(null);
       if (currentQuestionIndex < testQuestions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
+        // Test == finished; save
+        const finalScore = updatedQuestions.filter(q => q.isCorrect).length;
+        const newResult: TestResult = {
+          setName: selectedSet!.title,
+          score: finalScore,
+          totalQuestions: updatedQuestions.length,
+          date: new Date().toLocaleDateString(),
+        };
+        const updatedResults = [newResult, ...previousTests];
+        setPreviousTests(updatedResults);
+        localStorage.setItem('practiceTestResults', JSON.stringify(updatedResults));
+
         setTestState('results');
       }
-    }, 1000); // Wait 1 second to show feedback
+    }, 1000);
   };
 
   const score = testQuestions.filter(q => q.isCorrect).length;
 
-  // Renders the main content based on the current testState
   const renderContent = () => {
     switch (testState) {
       case 'selecting': {
         return (
-          <Card className="max-w-4xl mx-auto">
-            <CardHeader>
-              <CardTitle>Select a Study Set</CardTitle>
-              <CardDescription>Choose which set you'd like to be tested on and how many questions you want.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">1. Select a Set</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {allSets.map(set => (
-                    <Button 
-                      key={set.id} 
-                      variant={selectedSet?.id === set.id ? "default" : "outline"}
-                      onClick={() => setSelectedSet(set)}
-                      className="h-auto py-4"
-                    >
-                      {set.title}
-                    </Button>
-                  ))}
+          <>
+            <Card className="max-w-4xl mx-auto">
+              <CardHeader>
+                <CardTitle>Select a Study Set</CardTitle>
+                <CardDescription>Choose which set you'd like to be tested on and how many questions you want.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-2">1. Select a Set</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {allSets.map(set => (
+                      <Button 
+                        key={set.id} 
+                        variant={selectedSet?.id === set.id ? "default" : "outline"}
+                        onClick={() => setSelectedSet(set)}
+                        className="h-auto py-4"
+                      >
+                        {set.title}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              
-              {/* 3. Add the number input to the UI */}
-              <div className="space-y-2">
-                <label htmlFor="num-questions" className="text-lg font-medium">2. Number of Questions</label>
-                <Input
-                  id="num-questions"
-                  type="number"
-                  value={numQuestions}
-                  onChange={(e) => setNumQuestions(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                  className="max-w-[100px]"
-                  min="1"
-                  max="20"
-                />
-              </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="num-questions" className="text-lg font-medium">2. Number of Questions</label>
+                  <Input
+                    id="num-questions"
+                    type="number"
+                    value={numQuestions}
+                    onChange={(e) => setNumQuestions(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                    className="max-w-[100px]"
+                    min="1"
+                    max="20"
+                  />
+                </div>
 
-              <Button onClick={handleGenerateTest} disabled={!selectedSet} className="w-full">
-                <Sparkles className="mr-2 h-4 w-4" />
-                Generate Practice Test
-              </Button>
-            </CardContent>
-          </Card>
+                <Button onClick={handleGenerateTest} disabled={!selectedSet} className="w-full">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generate Practice Test
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Previous Tests Section */}
+            {previousTests.length > 0 && (
+              <div className="max-w-4xl mx-auto mt-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                  <History className="mr-2 h-6 w-6" />
+                  Previous Tests
+                </h2>
+                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+                  <CardContent className="p-6 space-y-3">
+                    {previousTests.slice(0, 5).map((result, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                        <div>
+                          <p className="font-semibold">{result.setName}</p>
+                          <p className="text-sm text-gray-500">Taken on {result.date}</p>
+                        </div>
+                        <p className="font-bold text-lg">{result.score} / {result.totalQuestions}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </>
         );
       }
       
@@ -244,7 +287,10 @@ const PracticeTestPage = () => {
                   </div>
                 ))}
               </div>
-              <Button onClick={() => setTestState('selecting')} className="w-full mt-6">
+              <Button onClick={() => {
+                setCurrentQuestionIndex(0);
+                setTestState('selecting');
+              }} className="w-full mt-6">
                 Take Another Test
               </Button>
             </CardContent>
